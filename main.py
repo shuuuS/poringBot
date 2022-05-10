@@ -13,6 +13,7 @@ DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 client = commands.Bot(command_prefix='.')
 client.remove_command('help')
 
+
 #information about bot activate
 @client.event
 async def on_ready():
@@ -24,7 +25,7 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    #modmail
+#modmail
     empty_array = []
     modmail_channel = discord.utils.get(client.get_all_channels(), name='mod-mail')
 
@@ -55,13 +56,15 @@ async def on_message(message):
 #Anti-spam
     if str(message.channel) == 'memy' and message.content != '':
         await message.channel.purge(limit=1)
+    if str(message.channel) == 'mod-mail' and message.content != '':
+        await message.channel.purge(limit=1)
 
 #randomThings
     if message.content.startswith('kiedy nostale'):
         if str(message.author) == 'shuS#2539':
             await message.channel.send('Czerwony przyjaciel, twierdzi, że ' + str(message.author)+'nigdy nie zagra')
         else:
-            await message.channel.send('Czerwony przyjaciel twierdzi, że możesz zacząć za chwilę :)')
+            await message.channel.send('Czerwony przyjaciel twierdzi, że nie warto :)')
             await message.channel.send(file=discord.File('uwuPoring.png'))
     if message.content == 'gupi poring':
         await message.channel.send('Sam jesteś głupi, ' + str(message.author))
@@ -107,6 +110,19 @@ async def server(ctx):
     embed.add_field(name='Member Count', value=memberCount, inline=True)
 
     await ctx.send(embed=embed)
+
+#cleanChat
+@client.command(pass_context=True)
+@commands.has_permissions(administrator=True)
+async def clean(ctx, limit: int):
+        await ctx.channel.purge(limit=limit+1)
+        await ctx.message.delete()
+
+@clean.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Chyba śnisz! Wszystko widziałem i zawiadomiłem policje!")
+
 
 #informationAboutPoring
 @client.command(aliases=['poring'])

@@ -31,7 +31,7 @@ class Player(commands.Cog):
     async def play_song(self, ctx, song):
         url = pafy.new(song).getbestaudio().url
         ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url)), after=lambda error: self.client.loop.create_task(self.check_queue(ctx)))
-        ctx.voice_client.source.volume = 0.5
+        ctx.voice_client.source.volume = 50
     @commands.command()
     async def join(self, ctx):
         if ctx.author.voice is None:
@@ -76,7 +76,7 @@ class Player(commands.Cog):
                 return await ctx.send(f'Mordo twoja perelka zostala dodana do mojej listy zabaw c: : {queue_len+1}.')
 
             else:
-                return await ctx.send('Sorry, moja lista jest pelna, poczekaj az sie skonczy obecna.')
+                return await ctx.send(f'Daj mi odpocząć :v')
 
         await self.play_song(ctx, song)
         await ctx.send(f"Teraz leci: {song}")
@@ -87,7 +87,7 @@ class Player(commands.Cog):
 
         await ctx.send('Szukam nuty, czekaj')
 
-        info = await self.search_song(5, song)
+        info = await self.search_song(10, song)
 
         embed = discord.Embed(title=f'Wynik dla "{song}":', description='*Mozesz uzyc tego linka, aby puscic nute.*\n', colour=discord.Colour.red())
 
@@ -96,7 +96,7 @@ class Player(commands.Cog):
             embed.description += f'[{entry["title"]}]({entry["webpage_url"]})\n'
             amount += 1
 
-        embed.set_footer(text=f'Pokazuje pierwsza {amount} piosenke')
+        embed.set_footer(text=f'Pokazuje pierwszy {amount} piosenek')
         await ctx.send(embed=embed)
 
     @commands.command()
