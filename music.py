@@ -1,4 +1,6 @@
 
+import asyncio
+
 import youtube_dl
 import pafy
 import discord
@@ -9,6 +11,9 @@ class Player(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.song_queue = {}
+
+        self.setup()
+
 
     def setup(self):
         for guild in self.client.guilds:
@@ -28,6 +33,7 @@ class Player(commands.Cog):
 
     async def play_song(self, ctx, song):
         url = pafy.new(song).getbestaudio().url
+
         ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
 
@@ -42,10 +48,12 @@ class Player(commands.Cog):
         ctx.voice_client.resume()
         await ctx.send("Resume")
 
+
     @commands.command()
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send('Nie jestes polaczony z voice chanelem.')
+
         voice_channel = ctx.author.voice.channel
         if ctx.voice_client is None:
             await voice_channel.connect()
@@ -53,10 +61,18 @@ class Player(commands.Cog):
             await ctx.voice_client.move_to(voice_channel)
 
 
+
+        if ctx.voice_client is not None:
+            await ctx.voice_client.disconnect()
+
+        await ctx.author.voice.channel.connect()
+
+
     @commands.command()
     async def leave(self, ctx):
         if ctx.voice_client is not None:
             return await ctx.voice_client.disconnect()
+
         else:
             await ctx.send('Nie jestem na voice chanelu.')
 
@@ -72,6 +88,10 @@ class Player(commands.Cog):
             url2 = info['formats'][0]['url']
             source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMEPG_OPTIONS)
             vc.play(source)
+
+
+        await ctx.send('Nie jestem na voice chanelu.')
+
 
     @commands.command()
     async def play(self, ctx, *, song=None):
@@ -137,6 +157,61 @@ class Player(commands.Cog):
 
         embed.set_footer(text='Dzięki za wykorzystanie mnie :)')
         await ctx.send(embed=embed)
+
+
+    @commands.command()
+    async def skip(self, ctx):
+        if ctx.voice_client is None:
+            return await ctx.send('O co ci chodzi, przeciez odpoczywam')
+
+        if ctx.author.voice is None:
+            return await ctx.send('Nie ma cie na voice chacie.')
+
+        if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
+            return await ctx.send('Nic obecnie dla ciebie nie gram')
+
+        poll = discord.Embed(title=f'Glosowanie po skipa piosenki od - {ctx.author.name}#{ctx.author.descriminator}', description='**80% voice channelu musi sie zgodzic', colour=discord.Colour.blue())
+        poll.add_field(name='Skip', value=':busiolek:')
+        poll.add_field(name='Stay', value=':gr:')
+        poll.set_footer(text="Glosowanie konczy sie za 15min")
+
+        poll_msg = await ctx.send(embed=poll)
+        poll_id = poll_msg.id
+
+        await poll_msg.add_reaction(u'\u2705') #yes
+        await poll_msg.add_reaction(u'\U0001F6AB') #no
+
+        await asyncio.sleep(15) #15s to vote
+
+        poll_msg = await ctx.channel.fetch_message(poll_id)
+
+        votes = {u'\u2705': 0, u'\U0001F6AB': 0}
+        reacted = []
+
+        for reaction in poll_msg.reactions:
+            if reaction.emoji in [u'\u2705', u'\U0001F6AB']:
+                async for user in reaction.users():
+                    if user.voice.channel.id == ctx.voice_client.channel.id and user.id not in reacted and not user.bot:
+                        votes[reacted.emoji] += 1
+
+                        reaction.append(user.id)
+
+        skip = False
+
+        if votes[u'\u2705'] > 0:
+            if votes[u'\U0001F6AB'] == 0 or votes[u'\u2705'] / (votes[u'\u2705'] + votes[u'\U0001F6AB']) > 0.79: #80 or higher
+                skip = True
+                embed = discord.Embed(title='Skip sie powiodl', description='***Glosowanie na skipa bylo udane, skipowankoooo.***', colour=discord.Colour.darker_grey())
+
+            if not skip:
+                embed = discord.Embed(title='Skip sie powiodl', description='***Glosowanie na skipa bylo udane, skipowankoooo.***', colour=discord.Colour.blurple())
+
+            embed.set_footer(text='Glosowanie sie zakonczylo')
+
+            await poll_msg.clear_reactions()
+            await poll_msg.edit(embed=embed)
+
+
 
 
 

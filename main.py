@@ -9,7 +9,10 @@ from dotenv import load_dotenv
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
+
 #-------------------------------------
+
+
 client = commands.Bot(command_prefix='.')
 client.remove_command('help')
 
@@ -103,6 +106,7 @@ async def server(ctx):
 
     memberCount = str(ctx.guild.member_count)
     icon = str(ctx.guild.icon_url)
+
     embed = discord.Embed(
         title=name,
         description=description,
@@ -138,7 +142,6 @@ async def setup():
     client.add_cog(Player(client))
 
 client.loop.create_task(setup())
-
 
 
 
