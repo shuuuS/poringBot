@@ -1,7 +1,7 @@
 
 import asyncio
-
 import youtube_dl
+import os
 import pafy
 import discord
 from discord.ext import commands
@@ -33,34 +33,13 @@ class Player(commands.Cog):
 
     async def play_song(self, ctx, song):
         url = pafy.new(song).getbestaudio().url
-
-        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url)), after=lambda error: self.bot.loop.create_task(self.check_queue(ctx)))
+        ctx.voice_client.play(discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url)), after=lambda error: self.client.loop.create_task(self.check_queue(ctx)))
         ctx.voice_client.source.volume = 0.5
-
-    @commands.command()
-    async def pause(self, ctx):
-        await ctx.voice_client.pause()
-        await ctx.send("Paused")
-
-
-    @commands.command()
-    async def resume(self, ctx):
-        ctx.voice_client.resume()
-        await ctx.send("Resume")
-
 
     @commands.command()
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send('Nie jestes polaczony z voice chanelem.')
-
-        voice_channel = ctx.author.voice.channel
-        if ctx.voice_client is None:
-            await voice_channel.connect()
-        else:
-            await ctx.voice_client.move_to(voice_channel)
-
-
 
         if ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
@@ -72,25 +51,19 @@ class Player(commands.Cog):
     async def leave(self, ctx):
         if ctx.voice_client is not None:
             return await ctx.voice_client.disconnect()
-
         else:
             await ctx.send('Nie jestem na voice chanelu.')
 
     @commands.command()
-    async def play2(self, ctx, url):
-        ctx.voice_client.stop()
-        FFMEPG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max5', 'options': '-vn'}
-        YDL_OPTIONS = {'format': "bestaudio"}
-        vc = ctx.voice_client
+    async def pause(self, ctx):
+        await ctx.voice_client.pause()
+        await ctx.send("Paused")
 
-        with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(url, download=False)
-            url2 = info['formats'][0]['url']
-            source = await discord.FFmpegOpusAudio.from_probe(url2, **FFMEPG_OPTIONS)
-            vc.play(source)
+    @commands.command()
+    async def resume(self, ctx):
+        ctx.voice_client.resume()
+        await ctx.send("Resume")
 
-
-        await ctx.send('Nie jestem na voice chanelu.')
 
 
     @commands.command()
@@ -99,11 +72,11 @@ class Player(commands.Cog):
             return await ctx.send('Musisz podac piosenke.')
 
         if ctx.voice_client is None:
-            return await ctx.send('Musisz być na voice chanelu.')
+            return await ctx.send('Może najpierw jakieś spotkanie? <wink><wink>.')
 
         #when song is not url
         if not ('youtube.com/watch?' in song or 'https://youtu.be/' in song):
-            await ctx.send('Niuhanie, proszę czekać')
+            await ctx.send('<Sniff> <sniff>, proszę czekać')
 
             result = await self.search_song(1, song, get_url=True)
 
@@ -117,7 +90,7 @@ class Player(commands.Cog):
 
             if queue_len < 10:
                 self.song_queue[ctx.guild.id].append(song)
-                return await ctx.send(f'Mordo twoja perelka zostala dodana do mojej listy zabaw c: : {queue_len+1}.')
+                return await ctx.send(f'Daj mi skończyć!~! Twoja piosenka zostala dodana:  {queue_len+1}.')
 
             else:
                 return await ctx.send(f'Daj mi odpocząć :v')
@@ -170,46 +143,10 @@ class Player(commands.Cog):
         if ctx.author.voice.channel.id != ctx.voice_client.channel.id:
             return await ctx.send('Nic obecnie dla ciebie nie gram')
 
-        poll = discord.Embed(title=f'Glosowanie po skipa piosenki od - {ctx.author.name}#{ctx.author.descriminator}', description='**80% voice channelu musi sie zgodzic', colour=discord.Colour.blue())
-        poll.add_field(name='Skip', value=':busiolek:')
-        poll.add_field(name='Stay', value=':gr:')
-        poll.set_footer(text="Glosowanie konczy sie za 15min")
+        if ctx.author.voice.channel.id == ctx.voice_client.channel.id:
+            return await ctx.send('Skipowanie...')
 
-        poll_msg = await ctx.send(embed=poll)
-        poll_id = poll_msg.id
 
-        await poll_msg.add_reaction(u'\u2705') #yes
-        await poll_msg.add_reaction(u'\U0001F6AB') #no
-
-        await asyncio.sleep(15) #15s to vote
-
-        poll_msg = await ctx.channel.fetch_message(poll_id)
-
-        votes = {u'\u2705': 0, u'\U0001F6AB': 0}
-        reacted = []
-
-        for reaction in poll_msg.reactions:
-            if reaction.emoji in [u'\u2705', u'\U0001F6AB']:
-                async for user in reaction.users():
-                    if user.voice.channel.id == ctx.voice_client.channel.id and user.id not in reacted and not user.bot:
-                        votes[reacted.emoji] += 1
-
-                        reaction.append(user.id)
-
-        skip = False
-
-        if votes[u'\u2705'] > 0:
-            if votes[u'\U0001F6AB'] == 0 or votes[u'\u2705'] / (votes[u'\u2705'] + votes[u'\U0001F6AB']) > 0.79: #80 or higher
-                skip = True
-                embed = discord.Embed(title='Skip sie powiodl', description='***Glosowanie na skipa bylo udane, skipowankoooo.***', colour=discord.Colour.darker_grey())
-
-            if not skip:
-                embed = discord.Embed(title='Skip sie powiodl', description='***Glosowanie na skipa bylo udane, skipowankoooo.***', colour=discord.Colour.blurple())
-
-            embed.set_footer(text='Glosowanie sie zakonczylo')
-
-            await poll_msg.clear_reactions()
-            await poll_msg.edit(embed=embed)
 
 
 

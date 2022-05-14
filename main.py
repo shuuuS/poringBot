@@ -9,11 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
+intents = discord.Intents.default()
+intents.members = True
+intents.messages = True
 
-#-------------------------------------
-
-
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix='.', intents=intents)
 client.remove_command('help')
 
 
@@ -23,11 +23,30 @@ async def on_ready():
     print('Aaaaaaaaa, siemanko!:3')
     await client.change_presence(activity=discord.Game(name='Polowanie na wrogów ojczyzny'))
 
+#memberJoin
+@client.event
+async def on_member_join(member):
+    channel = discord.utils.get(member.guild.channels, name='w-s-t-ę-p')
+    await channel.send(f'{member.mention} nas odwiedzil')
+
+#memberLeave
+@client.event
+async def on_member_remove(member):
+    channel = discord.utils.get(member.guild.channels, name='w-s-t-ę-p')
+    await channel.send(f'{member.mention} nas olal, htfu')
+
 #onMessage
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
+    words = ['jp2']
+    for i in words:
+        role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
+        await message.author.add_roles(role)
+        await message.channel.send('Brawo, zostałeś nowym katolikiem')
+
+
 #modmail
     empty_array = []
     modmail_channel = discord.utils.get(client.get_all_channels(), name='mod-mail')
@@ -76,6 +95,18 @@ async def on_message(message):
     await client.process_commands(message)
 
 
+#banCommand
+@client.command()
+@commands.has_permissions(ban_members=True)
+async def ban(ctx, member : discord.Member, reason='W imie Polski podziemnej'):
+    await member.ban(reason=reason)
+
+#kickCommand
+@client.command()
+@commands.has_permissions(administrator=True)
+async def kick(ctx, member : discord.Member, reason='Bez powodu'):
+    await member.kick(reason=reason)
+
 #commandList
 @client.command()
 async def list(ctx):
@@ -121,11 +152,11 @@ async def server(ctx):
 #cleanChat
 @client.command(pass_context=True)
 @commands.has_permissions(administrator=True)
-async def clean(ctx, limit: int):
+async def clear(ctx, limit: int):
         await ctx.channel.purge(limit=limit+1)
         await ctx.message.delete()
 
-@clean.error
+@clear.error
 async def clear_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("Chyba śnisz! Wszystko widziałem i zawiadomiłem policje!")
