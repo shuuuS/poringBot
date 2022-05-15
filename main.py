@@ -100,12 +100,14 @@ async def on_message(message):
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member : discord.Member, reason='W imie Polski podziemnej'):
     await member.ban(reason=reason)
+    await ctx.channel.send(f'{ctx.author} ustrzelił {member.mention}')
 
 #kickCommand
 @client.command()
 @commands.has_permissions(administrator=True)
 async def kick(ctx, member : discord.Member, reason='Bez powodu'):
     await member.kick(reason=reason)
+    await ctx.channel.send(f'{ctx.author} wykopał {member.mention}')
 
 #commandList
 @client.command()
@@ -119,11 +121,11 @@ async def list(ctx):
         title='List of commands'
 
     )
-    embed.add_field(name='Command list: ', value=commandList, inline=True)
-    embed.add_field(name='On Message list: ', value=onMessageList, inline=True)
+    embed.add_field(name='Command list: ', value=commandList, inline=False)
+    embed.add_field(name='On Message list: ', value=onMessageList, inline=False)
 
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, delete_after = 10)
 
 #serverInfo
 @client.command()
@@ -144,10 +146,11 @@ async def server(ctx):
         color=discord.Color.blue()
     )
     embed.set_thumbnail(url=icon)
-    embed.add_field(name='Owner', value=owner, inline=True)
-    embed.add_field(name='Member Count', value=memberCount, inline=True)
+    embed.add_field(name='Owner', value=owner, inline=False)
+    embed.add_field(name='Member Count', value=memberCount, inline=False)
+    embed.add_field(name='Icon', value=icon, inline=False)
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, delete_after = 10)
 
 #cleanChat
 @client.command(pass_context=True)
@@ -166,6 +169,30 @@ async def clear_error(ctx, error):
 @client.command(aliases=['poring'])
 async def glut(ctx):
     await ctx.send('Poringi są słodkimi dropsami pochodzącymi z ogromnej krainy zwanej Ymir.')
+
+#botActivity
+@client.command()
+async def stramuj(ctx, game):
+    await client.change_presence(activity=discord.Streaming(name=game, url="https://twitch.tv/shuuuS"))
+
+#weryfikacja
+@client.event()
+async def on_raw_reaction_add(payload):
+    if payload.message_id == 975358574928736276:
+        if payload.emoji.name == '✅':
+            guild = client.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+            rola = discord.utils.get(guild.roles, name='Jan Paweł 2')
+            await member.add_roles(rola)
+
+@client.event()
+async def on_raw_reaction_remove(payload):
+    if payload.message_id == 975358574928736276:
+        if payload.emoji.name == '✅':
+            guild = client.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+            rola = discord.utils.get(guild.roles, name='Jan Paweł 2')
+            await member.remove_roles(rola)
 
 #musicBot
 async def setup():
