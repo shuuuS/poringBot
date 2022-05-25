@@ -102,6 +102,20 @@ async def ban(ctx, member : discord.Member, reason='W imie Polski podziemnej'):
     await member.ban(reason=reason)
     await ctx.channel.send(f'{ctx.author} ustrzelił {member.mention}')
 
+#unbanCommand
+@client.command()
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, *, member):
+    banned = await ctx.guild.bans()
+    member_name, member_discriminator = member.split()
+
+    for ban_entry in banned:
+        user = ban_entry.user
+
+        if (user.name, user.discriminator) == (member_name, member_discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(f'{user.name} przeprasza za swojego zachowanie o.o')
+
 #kickCommand
 @client.command()
 @commands.has_permissions(administrator=True)

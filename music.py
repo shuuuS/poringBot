@@ -1,7 +1,6 @@
 
 import asyncio
 import youtube_dl
-import os
 import pafy
 import discord
 from discord.ext import commands
@@ -21,15 +20,15 @@ class Player(commands.Cog):
 
     async def check_queue(self, ctx):
         if len(self.song_queue[ctx.guild.id]) > 0:
-            ctx.voice_client.stop()
+
             await self.play_song(ctx, self.song_queue[ctx.guild.id][0])
             self.song_queue[ctx.guild.id].pop(0)
 
     async def search_song(self, amount, song, get_url=False):
-        info = await self.client.loop.run_in_executor(None, lambda: youtube_dl.YoutubeDL({'format' : 'bestaudio', 'quiet' : True}).extract_info(f'ytsearch{amount}:{song}', download=False, ie_key='YoutubeSearch'))
+        info = await self.client.loop.run_in_executor(None, lambda: youtube_dl.YoutubeDL({"format" : "bestaudio", "quiet" : True}).extract_info(f'ytsearch{amount}:{song}', download=False, ie_key='YoutubeSearch'))
         if len(info['entries']) == 0: return None
 
-        return [entry['webpage_url'] for entry in info['entries']] if get_url else info
+        return [entry["webpage_url"] for entry in info["entries"]] if get_url else info
 
     async def play_song(self, ctx, song):
         url = pafy.new(song).getbestaudio().url
@@ -51,8 +50,8 @@ class Player(commands.Cog):
     async def leave(self, ctx):
         if ctx.voice_client is not None:
             return await ctx.voice_client.disconnect()
-        else:
-            await ctx.send('Nie jestem na voice chanelu.')
+
+        await ctx.send('Nie jestem na voice chanelu.')
 
     @commands.command()
     async def pause(self, ctx):
