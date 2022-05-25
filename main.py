@@ -190,7 +190,7 @@ async def stramuj(ctx, game):
     await client.change_presence(activity=discord.Streaming(name=game, url="https://twitch.tv/shuuuS"))
 
 #weryfikacja
-@client.event()
+@client.event
 async def on_raw_reaction_add(payload):
     if payload.message_id == 975358574928736276:
         if payload.emoji.name == '✅':
@@ -199,7 +199,7 @@ async def on_raw_reaction_add(payload):
             rola = discord.utils.get(guild.roles, name='Jan Paweł 2')
             await member.add_roles(rola)
 
-@client.event()
+@client.event
 async def on_raw_reaction_remove(payload):
     if payload.message_id == 975358574928736276:
         if payload.emoji.name == '✅':
