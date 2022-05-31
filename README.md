@@ -1,2 +1,1 @@
-Jest to projekt z użyciem biblioteki discord.py, która umożliwia mi rozbudowe discord bota od zera. 
-Enjoy :)
+It is simple discord bot project by using Python library: discord.py. It has many music bot functions but not only. Besides that it can send private message to users by markins by the admin. 
