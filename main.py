@@ -14,6 +14,24 @@ intents.messages = True
 client = commands.Bot(command_prefix='.', intents=intents)
 
 
+<<<<<<< HEAD
+=======
+#unbanCommand
+@client.command()
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, *, member):
+    banned = await ctx.guild.bans()
+    member_name, member_discriminator = member.split()
+
+    for ban_entry in banned:
+        user = ban_entry.user
+
+        if (user.name, user.discriminator) == (member_name, member_discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(f'{user.name} przeprasza za swojego zachowanie o.o')
+
+#kickCommand
+>>>>>>> d419422b5790d6f2c0578421485bcc7796cb1ac1
 @client.command()
 async def load(ctx, extension):
     client.load_extension(f'cogs.{extension}')
