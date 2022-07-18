@@ -1,7 +1,7 @@
 
 import asyncio
 import youtube_dl
-import os
+
 import pafy
 import discord
 from discord.ext import commands
@@ -147,7 +147,8 @@ class Player(commands.Cog):
             return await ctx.send('Skipowanie...')
 
 
-
+def setup(client):
+    client.add_cog(Player(client))
 
 
 
