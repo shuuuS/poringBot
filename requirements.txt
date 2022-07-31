@@ -14,3 +14,4 @@ simple-youtube-api
 yarl
 youtube-dl
 setuptools
+aiohttp
