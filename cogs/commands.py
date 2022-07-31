@@ -21,13 +21,20 @@ class MiscCommands(commands.Cog):
         await member.kick(reason=reason)
         await ctx.channel.send(f'{ctx.author} wykopał {member.mention}')
 
-    #commandList
+    # unbanCommand
     @commands.command()
-    async def list(self, ctx):
-        embed = discord.Embed(title='Help on BOT', description='Some useful commands(prefix .)')
-        embed.add_field(name='On message', value="'jp2' 'kiedy nostale'")
-        await ctx.send(embed=embed, content=None, delete_after=10)
-        ctx.channel.purge(limit=1)
+    @commands.has_permissions(ban_members=True)
+    async def unban(self, ctx, member):
+        banned = await ctx.guild.bans()
+        member_name, member_discriminator = member.split()
+
+        for ban_entry in banned:
+            user = ban_entry.user
+
+            if (user.name, user.discriminator) == (member_name, member_discriminator):
+                await ctx.guild.unban(user)
+                await ctx.send(f'{user.name} przeprasza za swojego zachowanie o.o')
+
 
     #serverInfo
     @commands.command()
@@ -48,7 +55,7 @@ class MiscCommands(commands.Cog):
         embed.add_field(name='Member Count', value=memberCount, inline=False)
         embed.add_field(name='Icon', value=icon, inline=False)
 
-        await ctx.send(embed=embed, delete_after = 10)
+        await ctx.send(embed=embed, delete_after=10)
 
     #cleanChat
     @commands.command()
@@ -56,13 +63,6 @@ class MiscCommands(commands.Cog):
     async def clear(self, ctx, limit: int):
             await ctx.channel.purge(limit=limit+1)
             await ctx.message.delete()
-
-    # cleanChat
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def nuke(self, ctx, limit: int):
-        await ctx.channel.purge(limit=limit * 20)
-        await ctx.message.delete()
 
     @clear.error
     async def clear_error(self, ctx, error):
@@ -73,7 +73,7 @@ class MiscCommands(commands.Cog):
     #informationAboutPoring
     @commands.command()
     async def glut(self, ctx):
-        await ctx.send('Poringi są słodkimi dropsami pochodzącymi z ogromnej krainy zwanej Ymir.')
+        await ctx.send('Poringi są słodkimi dropsami pochodzącymi z ogromnej krainy zwanej Ymir.', delete_after=5)
 
     #botActivity
     @commands.command()

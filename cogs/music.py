@@ -1,10 +1,4 @@
-
-import asyncio
 import youtube_dl
-<<<<<<< HEAD:cogs/music.py
-
-=======
->>>>>>> d419422b5790d6f2c0578421485bcc7796cb1ac1:music.py
 import pafy
 import discord
 from discord.ext import commands

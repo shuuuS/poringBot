@@ -13,7 +13,7 @@ class MessageEvents(commands.Cog):
 
     #memberJoin
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def joined(self, member):
         channel = discord.utils.get(member.guild.channels, name='w-s-t-ę-p')
         await channel.send(f'{member.mention} nas odwiedzil')
 
@@ -89,21 +89,24 @@ class MessageEvents(commands.Cog):
     # weryfikacja
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id == 977905122011148318:
-            if payload.emoji.name == '✅':
-                guild = self.client.get_guild(payload.guild_id)
-                member = guild.get_member(payload.user_id)
-                rola = discord.utils.get(guild.roles, name='Jan Paweł 2')
-                await member.add_roles(rola)
+        if payload.message_id == 1002549710579568650:
+            guild = self.client.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
-        if payload.message_id == 977905122011148318:
-            if payload.emoji.name == '❌':
-                guild = self.client.get_guild(payload.guild_id)
-                member = guild.get_member(payload.user_id)
-                rola = discord.utils.get(guild.roles, name='Jan Paweł 2')
-                await member.remove_roles(rola)
+            if payload.emoji.name == '🐣':
+                role = discord.utils.get(guild.roles, name='Lunatic(｡◕‿◕｡)')
+                await member.add_roles(role)
+            if payload.emoji.name == '🐒':
+                role = discord.utils.get(guild.roles, name='Lig of Licz')
+                await member.add_roles(role)
+            if payload.emoji.name == '🐶':
+                role = discord.utils.get(guild.roles, name='Cisgoł')
+                await member.add_roles(role)
+            if payload.emoji.name == '🐝':
+                role = discord.utils.get(guild.roles, name='Tifi Tifi')
+                await member.add_roles(role)
+
+
 
 
 def setup(client):
