@@ -12,14 +12,14 @@ class MiscCommands(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member : discord.Member, reason='W imie Polski podziemnej'):
         await member.ban(reason=reason)
-        await ctx.channel.send(f'{ctx.author} ustrzelił {member.mention}')
+        await ctx.channel.send(f'{ctx.author} ustrzelił {member.mention}', delete_after=5)
 
     #kickCommand
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def kick(self, ctx, member : discord.Member, reason='Bez powodu'):
         await member.kick(reason=reason)
-        await ctx.channel.send(f'{ctx.author} wykopał {member.mention}')
+        await ctx.channel.send(f'{ctx.author} wykopał {member.mention}', delete_after=5)
 
     # unbanCommand
     @commands.command()
@@ -62,7 +62,7 @@ class MiscCommands(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def clear(self, ctx, limit: int):
             await ctx.channel.purge(limit=limit+1)
-            await ctx.message.delete()
+            await ctx.message.delete(delete_after=0.1)
 
     @clear.error
     async def clear_error(self, ctx, error):
@@ -78,12 +78,12 @@ class MiscCommands(commands.Cog):
     #botActivity
     @commands.command()
     async def stramuj(self, ctx, game):
-        await self.client.change_presence(activity=discord.Streaming(name=game, url="https://twitch.tv/shuuS"))
+        await self.client.change_presence(activity=discord.Streaming(name=game, url="https://twitch.tv/shuuS", delete_after=5))
 
     @commands.command()
     async def sentence(self, ctx, mood):
-        await self.client.change_presence(activity=discord.Activity(name=mood))
-
+        await self.client.change_presence(activity=discord.Activity(name=mood, delete_after=5))
+#repair sentence
 
 def setup(client):
     client.add_cog(MiscCommands(client))

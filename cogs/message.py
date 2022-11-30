@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 
@@ -29,14 +30,18 @@ class MessageEvents(commands.Cog):
         if message.author == self.client.user:
             return
 
+        if message.content.startswith('foczka'):
+            await message.channel.send("Nie zyja")
+
         if message.content == 'jp2':
             role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
             await message.author.add_roles(role)
             await message.channel.send('Brawo, zostałeś nowym katolikiem')
+
         if message.content == 'segz':
             role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
             await message.author.remove_roles(role)
-            await message.channel.send('Straciłeś zaufajnie kościoła')
+            await message.channel.send('Straciłeś zaufanie kościoła')
 
 
     #modmail
@@ -106,6 +111,24 @@ class MessageEvents(commands.Cog):
                 role = discord.utils.get(guild.roles, name='Tifi Tifi')
                 await member.add_roles(role)
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        if payload.message_id == 1002549710579568650:
+            guild = self.client.get_guild(payload.guild_id)
+            member = guild.get_member(payload.user_id)
+
+            if payload.emoji.name == '🐣':
+                role = discord.utils.get(guild.roles, name='Lunatic(｡◕‿◕｡)')
+                await member.remove_roles(role)
+            if payload.emoji.name == '🐒':
+                role = discord.utils.get(guild.roles, name='Lig of Licz')
+                await member.remove_roles(role)
+            if payload.emoji.name == '🐶':
+                role = discord.utils.get(guild.roles, name='Cisgoł')
+                await member.remove_roles(role)
+            if payload.emoji.name == '🐝':
+                role = discord.utils.get(guild.roles, name='Tifi Tifi')
+                await member.remove_roles(role)
 
 
 
