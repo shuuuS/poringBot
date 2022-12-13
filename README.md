@@ -1,1 +1,4 @@
-It is simple discord bot project by using Python library: discord.py. It has many music bot functions but not only. Besides that it can send private message (only for admins) or delete messages. 
+Discord bot project using discord.py library.
+Some functionality:
+->function for send and back private messages (modmail)
+->send random images from special folder (by saying "foczka")
