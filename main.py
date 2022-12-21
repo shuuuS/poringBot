@@ -13,7 +13,7 @@ intents.messages = True
 
 client = commands.Bot(command_prefix='.', intents=intents)
 
-
+# auto-reload every update in cogs
 @client.command()
 async def load(ctx, extension):
     client.load_extension(f'cogs.{extension}')

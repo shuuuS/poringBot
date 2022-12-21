@@ -1,7 +1,7 @@
-
+import os
 import discord
 from discord.ext import commands
-
+import random
 
 class MessageEvents(commands.Cog):
     def __init__(self, client):
@@ -12,27 +12,33 @@ class MessageEvents(commands.Cog):
         await self.client.change_presence(activity=discord.Game(name='Polowanie na wrogów ojczyzny'))
         print('Aaaaaaaaa, siemanko!:3')
 
-    #memberJoin
+    # server join
     @commands.Cog.listener()
     async def joined(self, member):
         channel = discord.utils.get(member.guild.channels, name='w-s-t-ę-p')
         await channel.send(f'{member.mention} nas odwiedzil')
 
-    #memberLeave
+    # server leave
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         channel = discord.utils.get(member.guild.channels, name='w-s-t-ę-p')
         await channel.send(f'{member.mention} nas olal, htfu')
 
-    #onMessage
+    # on-message
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author == self.client.user:
             return
 
+    # rolling images
         if message.content.startswith('foczka'):
-            await message.channel.send("Nie zyja")
+            images = os.path.join(os.getcwd(), "resources")
 
+            def select_random_image_path():
+                return os.path.join(images, random.choice(os.listdir(images)))
+            await message.channel.send("Bark bark", file=discord.File(select_random_image_path()))
+
+    # giga ulta super rare rank
         if message.content == 'jp2':
             role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
             await message.author.add_roles(role)
@@ -44,7 +50,7 @@ class MessageEvents(commands.Cog):
             await message.channel.send('Straciłeś zaufanie kościoła')
 
 
-    #modmail
+    # private message from bot - modmail
         empty_array = []
         modmail_channel = discord.utils.get(self.client.get_all_channels(), name='mod-mail')
 
@@ -72,13 +78,13 @@ class MessageEvents(commands.Cog):
                 mod_message = string[index:]
                 await member_object.send('[' + message.author.display_name + ']' + mod_message)
 
-    #Anti-spam
+    # prevent spam
         if str(message.channel) == 'memy' and message.content != '':
             await message.channel.purge(limit=1)
         if str(message.channel) == 'mod-mail' and message.content != '':
             await message.channel.purge(limit=1)
 
-    #randomThings
+    # random thing
         if message.content.startswith('kiedy nostale'):
             if str(message.author) == 'shuS#2539':
                 await message.channel.send('Czerwony przyjaciel, twierdzi, że ' + str(message.author)+'nigdy nie zagra')
@@ -88,10 +94,9 @@ class MessageEvents(commands.Cog):
         if message.content == 'gupi poring':
             await message.channel.send('Sam jesteś głupi, ' + str(message.author))
 
-    # important
         await self.client.process_commands(message)
 
-    # weryfikacja
+    # verification - auto_ranks
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if payload.message_id == 1002549710579568650:
@@ -111,6 +116,7 @@ class MessageEvents(commands.Cog):
                 role = discord.utils.get(guild.roles, name='Tifi Tifi')
                 await member.add_roles(role)
 
+    # remove ranks
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         if payload.message_id == 1002549710579568650:
@@ -129,8 +135,6 @@ class MessageEvents(commands.Cog):
             if payload.emoji.name == '🐝':
                 role = discord.utils.get(guild.roles, name='Tifi Tifi')
                 await member.remove_roles(role)
-
-
 
 def setup(client):
     client.add_cog(MessageEvents(client))
