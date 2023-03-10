@@ -4,7 +4,7 @@ from discord.ext import commands
 class MiscCommands(commands.Cog):
     def __init__(self, client):
         self.client = client
-
+        
     # ban
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -79,5 +79,5 @@ class MiscCommands(commands.Cog):
     async def sentence(self, ctx, mood):
         await self.client.change_presence(activity=discord.Activity(name=mood, delete_after=5))
 
-def setup(client):
-    client.add_cog(MiscCommands(client))
+async def setup(client):
+    await client.add_cog(MiscCommands(client))

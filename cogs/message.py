@@ -136,5 +136,5 @@ class MessageEvents(commands.Cog):
                 role = discord.utils.get(guild.roles, name='Tifi Tifi')
                 await member.remove_roles(role)
 
-def setup(client):
-    client.add_cog(MessageEvents(client))
+async def setup(client):
+    await client.add_cog(MessageEvents(client))
