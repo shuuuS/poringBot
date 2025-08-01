@@ -40,12 +40,16 @@ class MessageEvents(commands.Cog):
 
     # giga ulta super rare rank
         if message.content == 'jp2':
+            print("jp2 detected") 
             role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
+            print(f"Role found: {role}")
             await message.author.add_roles(role)
             await message.channel.send('Brawo, zostałeś nowym katolikiem')
 
         if message.content == 'segz':
+            print("segz detected")
             role = discord.utils.get(message.author.guild.roles, name='Jan Paweł 2')
+            print(f"Role found: {role}")
             await message.author.remove_roles(role)
             await message.channel.send('Straciłeś zaufanie kościoła')
 
